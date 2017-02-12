@@ -12,7 +12,7 @@ var keyDelay = 100; //typing delay in ms. If you have a faster roku, you can pro
 //null will cause the server to discover the Roku on startup, hard coding a value will allow for faster startups
 // When manually setting this, include the protocol, port, and trailing slash eg:
 // exports.rokuAddress = "http://192.168.1.100:8060/";
-var rokuAddress = null;
+var rokuAddress = 'http://192.168.1.8:8060/';
 
 //handle the ssdp response when the roku is found
 ssdp.on('response', function (headers, statusCode, rinfo) {
@@ -24,6 +24,7 @@ ssdp.on('response', function (headers, statusCode, rinfo) {
 function searchForRoku() {
     if (rokuAddress == null) {
         ssdp.search('roku:ecp');
+        console.log("searching");
     }
 }
 
@@ -294,6 +295,10 @@ var handlers = {
             response.end("OK");     //respond with OK before the operation finishes
         });
     },
+    "/roku/home":function(request,response) {        //the play and pause buttons are the same and is called "Play"
+        post(rokuAddress+"keypress/Home");
+        response.end("OK");    
+    },
     "/roku/playpause":function(request,response) {        //the play and pause buttons are the same and is called "Play"
         post(rokuAddress+"keypress/Play");
         response.end("OK");    
@@ -416,7 +421,7 @@ function home(address){
 }
 
 //start the MSEARCH background task to try every second (run it immediately too)
-setInterval(searchForRoku,1000);
+setInterval(searchForRoku,10);
 searchForRoku();
 
 //start the tcp server
